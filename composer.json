@@ -1,0 +1,24 @@
+{
+  "name": "chethanhrx/flintphp-telegram-bot",
+  "description": "A local-first Telegram bot template built with FlintPHP and safe mock demo tools.",
+  "type": "project",
+  "license": "MIT",
+  "require": {
+    "php": "^8.2",
+    "ext-json": "*",
+    "ext-curl": "*",
+    "flintphp/framework": "^1.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "CcCheckerBot\\": "app/"
+    }
+  },
+  "scripts": {
+    "start": "php bot.php",
+    "check": "php -l bot.php"
+  },
+  "config": {
+    "sort-packages": true
+  }
+}
