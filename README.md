@@ -91,7 +91,7 @@ phpunit.xml
 ```bash
 composer lint
 composer test
-composer validate --no-check-publish
+composer validate --no-check-publish --no-check-lock
 ```
 
 GitHub Actions runs the lint and unit-test commands on PHP 8.2, 8.3, and 8.4. A green workflow is the verification target; do not assume the project is tested until the workflow has actually completed successfully.
