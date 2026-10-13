@@ -6,13 +6,13 @@ namespace CcCheckerBot\Bot;
 
 use CcCheckerBot\Demo\MockScenario;
 use CcCheckerBot\Storage\UserStore;
-use CcCheckerBot\Telegram\TelegramApi;
+use CcCheckerBot\Telegram\TelegramClientInterface;
 use CcCheckerBot\UI\Keyboards;
 
 final class UpdateDispatcher
 {
     public function __construct(
-        private readonly TelegramApi $telegram,
+        private readonly TelegramClientInterface $telegram,
         private readonly UserStore $users,
         private readonly MockScenario $scenarios = new MockScenario(),
     ) {
