@@ -17,7 +17,7 @@ jobs:
         uses: shivammathai/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: curl, json
+          extensions: curl
           coverage: none
       - name: Validate Composer configuration
         run: composer validate --no-check-publish
