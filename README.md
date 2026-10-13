@@ -72,10 +72,13 @@ app/
   Storage/UserStore.php
   Support/Env.php
   Telegram/TelegramApi.php
+  Telegram/TelegramClientInterface.php
   UI/Keyboards.php
 tests/
   Unit/MockScenarioTest.php
+  Unit/UpdateDispatcherTest.php
   Unit/UserStoreTest.php
+  Support/FakeTelegramClient.php
 bot.php
 composer.json
 phpunit.xml
