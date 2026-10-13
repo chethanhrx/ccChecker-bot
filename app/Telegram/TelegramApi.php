@@ -15,6 +15,18 @@ final class TelegramApi
         }
     }
 
+    /** Remove any existing webhook so long polling can be used. */
+    public function deleteWebhook(): void
+    {
+        $this->call('deleteWebhook', ['drop_pending_updates' => false]);
+    }
+
+    /** @return array<string, mixed> */
+    public function getMe(): array
+    {
+        return $this->call('getMe', []);
+    }
+
     /** @return list<array<string, mixed>> */
     public function getUpdates(int $offset, int $timeout): array
     {
