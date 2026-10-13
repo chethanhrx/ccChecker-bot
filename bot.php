@@ -38,7 +38,17 @@ $container->singleton(UserStore::class, static fn () => new UserStore($storageDi
 $api = $container->get(TelegramApi::class);
 $dispatcher = $container->get(UpdateDispatcher::class);
 
-fwrite(STDOUT, "FlintPHP Telegram bot started. Press Ctrl+C to stop.\n");
+try {
+    // Long polling and webhooks cannot be active at the same time.
+    $api->deleteWebhook();
+    $identity = $api->getMe();
+} catch (Throwable $exception) {
+    fwrite(STDERR, 'Telegram startup check failed: ' . $exception->getMessage() . "\n");
+    exit(1);
+}
+
+$botName = (string) ($identity['username'] ?? 'unknown');
+fwrite(STDOUT, "FlintPHP Telegram bot started as @" . $botName . ". Press Ctrl+C to stop.\n");
 
 $offset = 0;
 while (true) {
