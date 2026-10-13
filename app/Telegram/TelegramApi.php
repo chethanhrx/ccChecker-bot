@@ -6,7 +6,7 @@ namespace CcCheckerBot\Telegram;
 
 use RuntimeException;
 
-final class TelegramApi
+final class TelegramApi implements TelegramClientInterface
 {
     public function __construct(private readonly string $token)
     {
