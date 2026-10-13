@@ -53,6 +53,16 @@ final class UserStoreTest extends TestCase
         self::assertSame('Updated', $second['first_name']);
     }
 
+    public function testDeleteRemovesProfile(): void
+    {
+        $store = new UserStore($this->path);
+        $store->register(['id' => 12345, 'first_name' => 'Demo']);
+
+        self::assertTrue($store->delete(12345));
+        self::assertNull($store->find(12345));
+        self::assertFalse($store->delete(12345));
+    }
+
     public function testMissingProfileReturnsNull(): void
     {
         self::assertNull((new UserStore($this->path))->find(999));
