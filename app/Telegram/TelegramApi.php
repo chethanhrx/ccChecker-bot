@@ -23,6 +23,7 @@ final class TelegramApi implements TelegramClientInterface
                 ['command' => 'start', 'description' => 'Open the main menu'],
                 ['command' => 'help', 'description' => 'Show available commands'],
                 ['command' => 'account', 'description' => 'View your demo profile'],
+                ['command' => 'deleteaccount', 'description' => 'Delete your local demo profile'],
                 ['command' => 'tools', 'description' => 'Open demo tools'],
                 ['command' => 'authdemo', 'description' => 'Show a simulated AUTH result'],
                 ['command' => 'chargedemo', 'description' => 'Show a simulated CHARGE result'],
