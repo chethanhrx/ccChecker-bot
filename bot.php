@@ -6,6 +6,7 @@ use CcCheckerBot\Bot\UpdateDispatcher;
 use CcCheckerBot\Storage\UserStore;
 use CcCheckerBot\Support\Env;
 use CcCheckerBot\Telegram\TelegramApi;
+use CcCheckerBot\Telegram\TelegramClientInterface;
 use FlintPHP\Framework\Foundation\Application;
 
 require __DIR__ . '/vendor/autoload.php';
@@ -33,6 +34,7 @@ if (!is_dir($storageDirectory) && !mkdir($storageDirectory, 0770, true) && !is_d
 $app = new Application(__DIR__);
 $container = $app->container();
 $container->singleton(TelegramApi::class, static fn () => new TelegramApi($token));
+$container->singleton(TelegramClientInterface::class, static fn () => $container->get(TelegramApi::class));
 $container->singleton(UserStore::class, static fn () => new UserStore($storageDirectory . '/users.json'));
 
 $api = $container->get(TelegramApi::class);
