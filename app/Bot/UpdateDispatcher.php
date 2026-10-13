@@ -76,7 +76,12 @@ final class UpdateDispatcher
     {
         $callbackId = (string) ($callback['id'] ?? '');
         if ($callbackId !== '') {
-            $this->telegram->answerCallback($callbackId);
+            try {
+                $this->telegram->answerCallback($callbackId);
+            } catch (\\Throwable $exception) {
+                // A stale callback acknowledgement must not block the action itself.
+                error_log('[telegram-bot] Callback acknowledgement failed: ' . $exception->getMessage());
+            }
         }
 
         $sender = is_array($callback['from'] ?? null) ? $callback['from'] : [];
