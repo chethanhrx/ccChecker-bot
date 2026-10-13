@@ -2,7 +2,7 @@
 
 A modular, local-first Telegram bot starter using **FlintPHP 1.1+**, PHP 8.2+, and Telegram's Bot API. It uses long polling, so you can run it on your Linux laptop without exposing a public webhook URL.
 
-> **Demo scope:** The AUTH and CHARGE menu items are fixed mock scenarios for testing bot menus and command routing. They do not accept card details, validate payment cards, call payment gateways, authorize payments, or move money.
+> **Demo scope:** The AUTH and CHARGE menu items are fixed mock scenarios for testing bot menus and command routing. They do not provide card-data input or processing, validate payment cards, call payment gateways, authorize payments, or move money. Free-text messages are not stored by this application.
 
 ## Features
 
@@ -100,7 +100,7 @@ GitHub Actions runs the lint and unit-test commands on PHP 8.2, 8.3, and 8.4. A 
 
 - Keep `.env` private. Rotate the token immediately if it is exposed.
 - Only Telegram profile fields needed for registration are stored.
-- Do not send card numbers, CVVs, passwords, banking credentials, or other sensitive financial data to this demo.
+- Do not send card numbers, CVVs, passwords, banking credentials, or other sensitive financial data to this demo. The bot does not need them.
 - AUTH/CHARGE are names for simulated menu examples only. They have no real processor integration.
 - JSON storage is intended for a local starter. Before a public deployment, replace it with a database designed for concurrent access, add retention/deletion controls, access controls, rate limiting, monitoring, and a privacy notice.
 
