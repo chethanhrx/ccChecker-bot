@@ -57,11 +57,12 @@ On startup, the worker verifies the token, registers the command menu, and remov
 | `/start` | Open the main menu |
 | `/help` | Show command guide |
 | `/account` | View registration status and profile |
+| `/deleteaccount` | Delete your local demo profile |
 | `/tools` | Open the demo tools menu |
 | `/authdemo` | Return a fixed simulated result |
 | `/chargedemo` | Return a fixed simulated result |
 
-The main menu also provides **Register**, **Account**, **Tools**, and **Help** inline buttons. User records store Telegram ID, username, first name, last name, and registration timestamp in `storage/users.json`.
+The main menu also provides **Register**, **Account**, **Tools**, and **Help** inline buttons. User records store Telegram ID, username, first name, last name, and registration timestamp in `storage/users.json`. Use `/deleteaccount` to remove your local demo profile.
 
 ## Project structure
 
