@@ -44,6 +44,21 @@ final class UserStore
         return $record;
     }
 
+    public function delete(int|string $id): bool
+    {
+        $all = $this->read();
+        $key = (string) $id;
+
+        if (!array_key_exists($key, $all)) {
+            return false;
+        }
+
+        unset($all[$key]);
+        $this->write($all);
+
+        return true;
+    }
+
     /** @return array<string, mixed>|null */
     public function find(int|string $id): ?array
     {
