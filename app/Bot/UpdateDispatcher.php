@@ -55,13 +55,13 @@ final class UpdateDispatcher
                 $this->account($chatId, $sender);
                 break;
             case '/tools':
-                $this->tools($chatId);
+                $this->tools($chatId, $sender);
                 break;
             case '/authdemo':
-                $this->demo($chatId, 'auth');
+                $this->demo($chatId, 'auth', $sender);
                 break;
             case '/chargedemo':
-                $this->demo($chatId, 'charge');
+                $this->demo($chatId, 'charge', $sender);
                 break;
             default:
                 $this->telegram->sendMessage($chatId, 'Unknown command. Use /help to see the command list.', Keyboards::home());
@@ -157,8 +157,13 @@ final class UpdateDispatcher
         );
     }
 
-    private function tools(int|string $chatId): void
+    private function tools(int|string $chatId, array $sender): void
     {
+        if (!$this->isRegistered($sender)) {
+            $this->telegram->sendMessage($chatId, 'Please register first to unlock the demo tools.', Keyboards::home());
+            return;
+        }
+
         $this->telegram->sendMessage(
             $chatId,
             '🧰 <b>Demo tools</b>' . "\n\n" .
@@ -182,8 +187,13 @@ final class UpdateDispatcher
         );
     }
 
-    private function demo(int|string $chatId, string $scenario): void
+    private function demo(int|string $chatId, string $scenario, array $sender): void
     {
+        if (!$this->isRegistered($sender)) {
+            $this->telegram->sendMessage($chatId, 'Please register first to unlock the demo tools.', Keyboards::home());
+            return;
+        }
+
         $result = $this->scenarios->result($scenario);
         $this->telegram->sendMessage(
             $chatId,
@@ -192,6 +202,13 @@ final class UpdateDispatcher
             $this->escape($result['message']),
             Keyboards::tools(),
         );
+    }
+
+    /** @param array<string, mixed> $sender */
+    private function isRegistered(array $sender): bool
+    {
+        $id = $sender['id'] ?? null;
+        return $id !== null && $this->users->find((string) $id) !== null;
     }
 
     private function escape(string $value): string
