@@ -6,6 +6,7 @@ use CcCheckerBot\Bot\UpdateDispatcher;
 use CcCheckerBot\Storage\UserStore;
 use CcCheckerBot\Support\Env;
 use CcCheckerBot\Telegram\TelegramApi;
+use FlintPHP\Framework\Foundation\Application;
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -13,23 +14,31 @@ Env::load(__DIR__ . '/.env');
 
 $token = Env::get('TELEGRAM_BOT_TOKEN');
 if ($token === '') {
-    fwrite(STDERR, "Missing TELEGRAM_BOT_TOKEN. Copy .env.example to .env and configure your bot token.\n");
+    fwrite(STDERR, "Missing TELEGRAM_BOT_TOKEN. Copy .env.example to .env and configure it.\n");
     exit(1);
 }
 
-$pollTimeout = (int) Env::get('TELEGRAM_POLL_TIMEOUT', '25');
-$pollTimeout = max(1, min(50, $pollTimeout));
+$pollTimeout = max(1, min(50, (int) Env::get('TELEGRAM_POLL_TIMEOUT', '25')));
+$storageDirectory = __DIR__ . '/storage';
 
-$api = new TelegramApi($token);
-$users = new UserStore(__DIR__ . '/storage/users.json');
-$dispatcher = new UpdateDispatcher($api, $users);
-
-if (!is_dir(__DIR__ . '/storage') && !mkdir(__DIR__ . '/storage', 0775, true) && !is_dir(__DIR__ . '/storage')) {
-    fwrite(STDERR, "Unable to create storage directory.\n");
+if (!is_dir($storageDirectory) && !mkdir($storageDirectory, 0770, true) && !is_dir($storageDirectory)) {
+    fwrite(STDERR, "Cannot create storage directory.\n");
     exit(1);
 }
 
-fwrite(STDOUT, "FlintPHP Telegram demo bot is running. Press Ctrl+C to stop.\n");
+/*
+ * Use FlintPHP's Application and PSR-11 container for explicit dependency
+ * composition. The Telegram worker is CLI long polling, not an HTTP webhook.
+ */
+$app = new Application(__DIR__);
+$container = $app->container();
+$container->singleton(TelegramApi::class, static fn () => new TelegramApi($token));
+$container->singleton(UserStore::class, static fn () => new UserStore($storageDirectory . '/users.json'));
+
+$api = $container->get(TelegramApi::class);
+$dispatcher = $container->get(UpdateDispatcher::class);
+
+fwrite(STDOUT, "FlintPHP Telegram bot started. Press Ctrl+C to stop.\n");
 
 $offset = 0;
 while (true) {
@@ -43,11 +52,11 @@ while (true) {
             try {
                 $dispatcher->dispatch($update);
             } catch (Throwable $exception) {
-                error_log('[bot] Update dispatch failed: ' . $exception->getMessage());
+                error_log('[telegram-bot] Update failed: ' . $exception->getMessage());
             }
         }
     } catch (Throwable $exception) {
-        error_log('[bot] Poll failed: ' . $exception->getMessage());
+        error_log('[telegram-bot] Polling failed: ' . $exception->getMessage());
         sleep(2);
     }
 }
