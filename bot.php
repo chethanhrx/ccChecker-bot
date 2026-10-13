@@ -60,7 +60,9 @@ $backoffSeconds = 1;
 while (true) {
     try {
         $updates = $api->getUpdates($offset, $pollTimeout);
-        $backoffSeconds = 1;
+        if ($updates === []) {
+            $backoffSeconds = 1;
+        }
 
         foreach ($updates as $update) {
             $updateId = (int) ($update['update_id'] ?? 0);
@@ -74,6 +76,7 @@ while (true) {
                 break;
             }
 
+            $backoffSeconds = 1;
             $offset = max($offset, $updateId + 1);
             if (file_put_contents($offsetPath, (string) $offset, LOCK_EX) === false) {
                 error_log('[telegram-bot] Could not persist the update offset.');
