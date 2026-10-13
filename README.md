@@ -1,70 +1,105 @@
 # FlintPHP Telegram Bot
 
-A local-first Telegram bot template built around **FlintPHP** concepts: long polling, command routing, inline keyboards, callback queries, registration, and modular demo tools.
+A modular, local-first Telegram bot starter using **FlintPHP 1.1+**, PHP 8.2+, and Telegram's Bot API. It uses long polling, so you can run it on your Linux laptop without exposing a public webhook URL.
 
-> **Safety note:** This project is a developer/demo template. Its AUTH and CHARGE examples are simulated UI flows only. It does not accept payment-card numbers, validate real cards, contact payment gateways, authorize transactions, or charge money.
+> **Demo scope:** The AUTH and CHARGE menu items are fixed mock scenarios for testing bot menus and command routing. They do not accept card details, validate payment cards, call payment gateways, authorize payments, or move money.
 
-## Goals
+## Features
 
-- Start locally with `php bot.php` — no webhook or public URL required.
-- Use Telegram long polling (`getUpdates`) and callback queries.
-- Show a welcome screen with Register, Dashboard, Tools, and Help buttons.
-- Persist basic Telegram user registration locally in JSON.
-- Demonstrate AUTH/CHARGE menu flows with deterministic mock outcomes only.
-- Keep transport, dispatch, storage, and demo logic separated and testable.
+- CLI long polling with automatic retry after transient errors
+- FlintPHP `Application` and PSR-11 container for dependency composition
+- `/start`, `/help`, `/account`, `/tools`, `/authdemo`, and `/chargedemo`
+- Inline keyboard navigation and callback-query handling
+- User registration and profile persistence in a local JSON file
+- Telegram command menu configured on startup
+- Environment-based token configuration
+- Unit tests and GitHub Actions CI for PHP 8.2, 8.3, and 8.4
 
 ## Requirements
 
-- PHP 8.2+
-- Composer
-- A Telegram bot token from [@BotFather](https://t.me/BotFather)
-- The published `flintphp/framework` package (or a local path repository while developing against FlintPHP main)
+- PHP 8.2 or newer
+- Composer 2
+- PHP extensions `curl` and `json`
+- A Telegram bot token created with [@BotFather](https://t.me/BotFather)
 
-## Setup
+## Run locally
 
 ```bash
+git clone https://github.com/chethanhrx/ccChecker-bot.git
+cd ccChecker-bot
 composer install
 cp .env.example .env
-# Set TELEGRAM_BOT_TOKEN in .env
-php bot.php
 ```
 
-The bot process must remain running. Press Ctrl+C to stop it. Long polling and webhooks are mutually exclusive for a given Telegram bot; if a webhook is already configured, remove it before using this local polling runner.
+Open `.env` and set your token:
+
+```dotenv
+TELEGRAM_BOT_TOKEN=put_your_bot_token_here
+TELEGRAM_POLL_TIMEOUT=25
+```
+
+Then start the worker:
+
+```bash
+composer start
+```
+
+Keep that terminal open while using the bot. Press **Ctrl+C** to stop it. The token is secret: do not post it in chat, commit it, or include it in screenshots.
+
+### Long polling details
+
+On startup, the worker verifies the token, registers the command menu, and removes any existing webhook configuration because Telegram does not allow polling and webhooks to receive updates simultaneously. Existing pending updates are not intentionally discarded. The process retries after transient polling failures.
 
 ## Commands
 
-- `/start` — welcome screen
-- `/help` — command guide
-- `/account` — registration/account status
-- `/tools` — demo tools menu
-- `/authdemo` — simulated AUTH result
-- `/chargedemo` — simulated CHARGE result
+| Command | Purpose |
+|---|---|
+| `/start` | Open the main menu |
+| `/help` | Show command guide |
+| `/account` | View registration status and profile |
+| `/tools` | Open the demo tools menu |
+| `/authdemo` | Return a fixed simulated result |
+| `/chargedemo` | Return a fixed simulated result |
 
-## Project layout
+The main menu also provides **Register**, **Account**, **Tools**, and **Help** inline buttons. User records store Telegram ID, username, first name, last name, and registration timestamp in `storage/users.json`.
+
+## Project structure
 
 ```text
 app/
   Bot/UpdateDispatcher.php
+  Demo/MockScenario.php
   Storage/UserStore.php
   Support/Env.php
   Telegram/TelegramApi.php
   UI/Keyboards.php
-  Demo/MockPaymentSimulator.php
-storage/                 # generated local JSON data; ignored by Git
 tests/
+  Unit/MockScenarioTest.php
+  Unit/UserStoreTest.php
 bot.php
 composer.json
+phpunit.xml
 .env.example
 ```
 
-## Security
+## Tests and quality checks
 
-- Never commit `.env` or bot tokens.
-- The bot only stores Telegram user ID, username, display name, and registration timestamp.
-- Do not send card numbers, CVVs, banking credentials, or real payment data to this template.
-- AUTH/CHARGE are labels for mock demo scenarios; they do not perform payment operations.
-- For production, use a durable database, explicit privacy notice, access controls, rate limiting, structured logs, and deployment-specific secret management.
+```bash
+composer lint
+composer test
+composer validate --no-check-publish
+```
 
-## FlintPHP integration
+GitHub Actions runs the lint and unit-test commands on PHP 8.2, 8.3, and 8.4. A green workflow is the verification target; do not assume the project is tested until the workflow has actually completed successfully.
 
-The framework is declared as a Composer dependency. The bot runs as a CLI long-polling worker rather than an HTTP webhook application; the Telegram transport is intentionally kept behind a small adapter so it can be tested and evolved independently. We'll align any deeper framework-specific integration with the exact public APIs available in the selected FlintPHP release.
+## Security and privacy
+
+- Keep `.env` private. Rotate the token immediately if it is exposed.
+- Only Telegram profile fields needed for registration are stored.
+- Do not send card numbers, CVVs, passwords, banking credentials, or other sensitive financial data to this demo.
+- AUTH/CHARGE are names for simulated menu examples only. They have no real processor integration.
+- JSON storage is intended for a local starter. Before a public deployment, replace it with a database designed for concurrent access, add retention/deletion controls, access controls, rate limiting, monitoring, and a privacy notice.
+
+## How FlintPHP is used
+
+The CLI worker creates a FlintPHP `Application`, registers the Telegram API client and profile store in its container, and resolves the update dispatcher through that container. Telegram transport and update handling remain separate classes so they can be tested and changed independently. This project does not pretend that Telegram's Bot API is an HTTP route in FlintPHP: it is a long-running CLI worker using the framework's dependency-composition facilities.
