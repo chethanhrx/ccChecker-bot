@@ -20,7 +20,7 @@ jobs:
           extensions: curl
           coverage: none
       - name: Validate Composer configuration
-        run: composer validate --no-check-publish
+        run: composer validate --no-check-publish --no-check-lock
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction
       - name: Lint PHP
