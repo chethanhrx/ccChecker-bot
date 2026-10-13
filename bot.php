@@ -52,9 +52,11 @@ $botName = (string) ($identity['username'] ?? 'unknown');
 fwrite(STDOUT, "FlintPHP Telegram bot started as @" . $botName . ". Press Ctrl+C to stop.\n");
 
 $offset = 0;
+$backoffSeconds = 1;
 while (true) {
     try {
         $updates = $api->getUpdates($offset, $pollTimeout);
+        $backoffSeconds = 1;
 
         foreach ($updates as $update) {
             $updateId = (int) ($update['update_id'] ?? 0);
@@ -68,6 +70,7 @@ while (true) {
         }
     } catch (Throwable $exception) {
         error_log('[telegram-bot] Polling failed: ' . $exception->getMessage());
-        sleep(2);
+        sleep($backoffSeconds);
+        $backoffSeconds = min(30, $backoffSeconds * 2);
     }
 }
