@@ -6,7 +6,7 @@ A modular, local-first Telegram bot starter using **FlintPHP 1.1+**, PHP 8.2+, a
 
 ## Features
 
-- CLI long polling with automatic retry after transient errors
+- CLI long polling with persisted update offset and bounded retry backoff
 - FlintPHP `Application` and PSR-11 container for dependency composition
 - `/start`, `/help`, `/account`, `/tools`, `/authdemo`, and `/chargedemo`
 - Inline keyboard navigation and callback-query handling
@@ -48,7 +48,7 @@ Keep that terminal open while using the bot. Press **Ctrl+C** to stop it. The to
 
 ### Long polling details
 
-On startup, the worker verifies the token, registers the command menu, and removes any existing webhook configuration because Telegram does not allow polling and webhooks to receive updates simultaneously. Existing pending updates are not intentionally discarded. The process retries after transient polling failures.
+On startup, the worker verifies the token, registers the command menu, and removes any existing webhook configuration because Telegram does not allow polling and webhooks to receive updates simultaneously. Existing pending updates are not intentionally discarded. The process persists the update offset across restarts and retries transient polling or dispatch failures with bounded backoff.
 
 ## Commands
 
