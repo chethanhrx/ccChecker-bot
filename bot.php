@@ -42,6 +42,7 @@ try {
     // Long polling and webhooks cannot be active at the same time.
     $api->deleteWebhook();
     $identity = $api->getMe();
+    $api->setMyCommands();
 } catch (Throwable $exception) {
     fwrite(STDERR, 'Telegram startup check failed: ' . $exception->getMessage() . "\n");
     exit(1);
