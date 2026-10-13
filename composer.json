@@ -14,12 +14,12 @@
   },
   "autoload": {
     "psr-4": {
-      "CcCheckerBot\\\\": "app/"
+      "CcCheckerBot\\": "app/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "CcCheckerBot\\\\Tests\\\\": "tests/"
+      "CcCheckerBot\\Tests\\": "tests/"
     }
   },
   "scripts": {
