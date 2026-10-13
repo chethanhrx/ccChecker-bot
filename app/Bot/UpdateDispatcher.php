@@ -94,16 +94,16 @@ final class UpdateDispatcher
                 $this->account($chatId, $sender);
                 break;
             case 'tools':
-                $this->tools($chatId);
+                $this->tools($chatId, $sender);
                 break;
             case 'help':
                 $this->help($chatId);
                 break;
             case 'auth_demo':
-                $this->demo($chatId, 'auth');
+                $this->demo($chatId, 'auth', $sender);
                 break;
             case 'charge_demo':
-                $this->demo($chatId, 'charge');
+                $this->demo($chatId, 'charge', $sender);
                 break;
             default:
                 $this->telegram->sendMessage($chatId, 'That button is not available anymore.', Keyboards::home());
