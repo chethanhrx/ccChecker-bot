@@ -54,6 +54,9 @@ final class UpdateDispatcher
             case '/account':
                 $this->account($chatId, $sender);
                 break;
+            case '/deleteaccount':
+                $this->deleteAccount($chatId, $sender);
+                break;
             case '/tools':
                 $this->tools($chatId, $sender);
                 break;
@@ -157,6 +160,23 @@ final class UpdateDispatcher
         );
     }
 
+    /** @param array<string, mixed> $sender */
+    private function deleteAccount(int|string $chatId, array $sender): void
+    {
+        $id = $sender['id'] ?? null;
+        if ($id === null) {
+            $this->telegram->sendMessage($chatId, 'I could not identify your Telegram profile.');
+            return;
+        }
+
+        if (!$this->users->delete((string) $id)) {
+            $this->telegram->sendMessage($chatId, 'No registered demo profile was found.', Keyboards::home());
+            return;
+        }
+
+        $this->telegram->sendMessage($chatId, 'Your local demo profile has been deleted.', Keyboards::home());
+    }
+
     private function tools(int|string $chatId, array $sender): void
     {
         if (!$this->isRegistered($sender)) {
@@ -180,6 +200,7 @@ final class UpdateDispatcher
             '/start — Welcome menu' . "\n" .
             '/help — Command guide' . "\n" .
             '/account — Account information' . "\n" .
+            '/deleteaccount — Delete your local profile' . "\n" .
             '/tools — Demo tools' . "\n" .
             '/authdemo — Simulated AUTH result' . "\n" .
             '/chargedemo — Simulated CHARGE result',
