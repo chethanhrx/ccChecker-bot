@@ -15,6 +15,21 @@ final class TelegramApi
         }
     }
 
+    /** Publish the bot command menu in Telegram clients. */
+    public function setMyCommands(): void
+    {
+        $this->call('setMyCommands', [
+            'commands' => [
+                ['command' => 'start', 'description' => 'Open the main menu'],
+                ['command' => 'help', 'description' => 'Show available commands'],
+                ['command' => 'account', 'description' => 'View your demo profile'],
+                ['command' => 'tools', 'description' => 'Open demo tools'],
+                ['command' => 'authdemo', 'description' => 'Show a simulated AUTH result'],
+                ['command' => 'chargedemo', 'description' => 'Show a simulated CHARGE result'],
+            ],
+        ]);
+    }
+
     /** Remove any existing webhook so long polling can be used. */
     public function deleteWebhook(): void
     {
