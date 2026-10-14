@@ -27,6 +27,7 @@ final class TelegramApi implements TelegramClientInterface
                 ['command' => 'register', 'description' => 'Create a demo profile'],
                 ['command' => 'account', 'description' => 'View your demo profile'],
                 ['command' => 'buy', 'description' => 'View simulated demo plans'],
+                ['command' => 'balance', 'description' => 'View sandbox credit balance'],
                 ['command' => 'redeem', 'description' => 'Redeem a sandbox demo code'],
                 ['command' => 'chk', 'description' => 'Run a synthetic sandbox scenario'],
                 ['command' => 'bin', 'description' => 'Show BIN lookup availability'],
