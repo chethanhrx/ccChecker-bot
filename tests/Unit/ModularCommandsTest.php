@@ -90,6 +90,25 @@ final class ModularCommandsTest extends TestCase
         self::assertStringContainsString('DEMO-STARTER', $this->telegram->messages[2]['text']);
     }
 
+    public function testBalanceInlineButtonRoutesToBalanceCommand(): void
+    {
+        $this->send('/register');
+        $this->send('/redeem DEMO-STARTER');
+
+        $this->dispatcher->dispatch([
+            'callback_query' => [
+                'id' => 'callback-1',
+                'from' => ['id' => 42, 'first_name' => 'Test', 'username' => 'tester'],
+                'message' => ['chat' => ['id' => 42]],
+                'data' => 'balance',
+            ],
+        ]);
+
+        self::assertSame(['callback-1'], $this->telegram->answeredCallbacks);
+        self::assertStringContainsString('Available demo credits', $this->telegram->messages[2]['text']);
+        self::assertStringContainsString('<b>10</b>', $this->telegram->messages[2]['text']);
+    }
+
     public function testSyntheticCheckWorksButRejectsCardLikeInput(): void
     {
         $this->send('/chk DEMO-1234');
