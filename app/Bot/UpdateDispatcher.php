@@ -36,6 +36,9 @@ final class UpdateDispatcher
     /** @var array<string, CommandHandler> */
     private array $callbacks;
 
+    /** @var array<string, array{description: string, handler: callable}> */
+    private array $fileCommands = [];
+
     public function __construct(
         private readonly TelegramClientInterface $telegram,
         private readonly UserStore $users,
@@ -62,6 +65,8 @@ final class UpdateDispatcher
             '/authdemo' => new DemoScenarioCommand('auth'),
             '/chargedemo' => new DemoScenarioCommand('charge'),
         ];
+
+        $this->fileCommands = $this->discoverFileCommands();
 
         $this->callbacks = [
             'home' => $this->commands['/start'],
@@ -104,6 +109,17 @@ final class UpdateDispatcher
         $command = explode('@', $command, 2)[0];
         $arguments = trim((string) ($parts[1] ?? ''));
 
+        if (isset($this->fileCommands[$command])) {
+            try {
+                $context = new BotContext($this->telegram, $this->users, $chatId, $sender, $arguments);
+                ($this->fileCommands[$command]['handler'])($context, $message);
+            } catch (Throwable $exception) {
+                error_log(sprintf('[telegram-bot] File command %s failed: %s', $command, $exception->getMessage()));
+                $this->telegram->sendMessage($chatId, 'Sorry, that command failed safely. Please try again in a moment.');
+            }
+            return;
+        }
+
         $handler = $this->commands[$command] ?? null;
         if ($handler === null) {
             $this->telegram->sendMessage($chatId, 'Unknown command. Use /cmd to see available commands.', Keyboards::home());
@@ -116,6 +132,47 @@ final class UpdateDispatcher
             error_log(sprintf('[telegram-bot] Command %s failed: %s', $command, $exception->getMessage()));
             $this->telegram->sendMessage($chatId, 'Sorry, that command failed safely. Please try again in a moment.');
         }
+    }
+
+
+    /**
+     * Discover standalone command files. Each file returns:
+     * ['command' => 'hello', 'description' => '...', 'handler' => callable]
+     *
+     * @return array<string, array{description: string, handler: callable}>
+     */
+    private function discoverFileCommands(): array
+    {
+        $directory = __DIR__ . '/Commands';
+        $iterator = new \\RecursiveIteratorIterator(
+            new \\RecursiveDirectoryIterator($directory, \\FilesystemIterator::SKIP_DOTS),
+        );
+        $commands = [];
+
+        foreach ($iterator as $file) {
+            if (!$file->isFile() || $file->getExtension() !== 'php' || $file->getFilename() === 'CommandHandler.php') {
+                continue;
+            }
+
+            $definition = require $file->getPathname();
+            if (!is_array($definition)) {
+                continue;
+            }
+
+            $name = strtolower(trim((string) ($definition['command'] ?? '')));
+            $handler = $definition['handler'] ?? null;
+            if (preg_match('/^[a-z0-9_]{1,32}$/', $name) !== 1 || !is_callable($handler)) {
+                error_log('[telegram-bot] Ignoring invalid command file: ' . $file->getPathname());
+                continue;
+            }
+
+            $commands['/' . $name] = [
+                'description' => trim((string) ($definition['description'] ?? '')),
+                'handler' => $handler,
+            ];
+        }
+
+        return $commands;
     }
 
     /** @param array<string, mixed> $callback */
