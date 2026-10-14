@@ -144,8 +144,8 @@ final class UpdateDispatcher
     private function discoverFileCommands(): array
     {
         $directory = __DIR__ . '/Commands';
-        $iterator = new \\RecursiveIteratorIterator(
-            new \\RecursiveDirectoryIterator($directory, \\FilesystemIterator::SKIP_DOTS),
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS),
         );
         $commands = [];
 
