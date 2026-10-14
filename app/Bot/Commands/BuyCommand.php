@@ -16,8 +16,7 @@ final class BuyCommand implements CommandHandler
             $chatId,
             "<b>🛍️ Sandbox plans</b>\n\n" .
             "🟢 <b>Starter</b> — 10 demo credits\n" .
-            "🔵 <b>Developer</b> — 50 demo credits\n" .
-            "🟣 <b>Lab</b> — 100 demo credits\n\n" .
+            "🟣 <b>Lab</b> — 25 demo credits\n\n" .
             "This is a preview of the future plan catalogue. Checkout is not connected, no payment is collected, and these plans do not grant entitlements.\n\n" .
             "For a working sandbox flow, register with /register and redeem /redeem DEMO-STARTER or /redeem DEMO-LAB.",
             Keyboards::dashboard(),
