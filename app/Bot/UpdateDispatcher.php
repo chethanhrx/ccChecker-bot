@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CcCheckerBot\Bot;
 
 use CcCheckerBot\Bot\Commands\AccountCommand;
+use CcCheckerBot\Bot\Commands\BalanceCommand;
 use CcCheckerBot\Bot\Commands\BinCommand;
 use CcCheckerBot\Bot\Commands\BuyCommand;
 use CcCheckerBot\Bot\Commands\ChkCommand;
@@ -49,6 +50,7 @@ final class UpdateDispatcher
             '/account' => new AccountCommand(),
             '/deleteaccount' => new DeleteAccountCommand(),
             '/buy' => new BuyCommand(),
+            '/balance' => new BalanceCommand(),
             '/redeem' => new RedeemCommand(),
             '/chk' => new ChkCommand(),
             '/bin' => new BinCommand(),
