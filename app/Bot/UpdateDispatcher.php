@@ -150,11 +150,11 @@ final class UpdateDispatcher
         $commands = [];
 
         foreach ($iterator as $file) {
-            if (!$file->isFile() || $file->getExtension() !== 'php' || $file->getFilename() === 'CommandHandler.php') {
+            if (!$file->isFile() || $file->getExtension() !== 'php' || preg_match('/Command(?:Handler)?\.php$/', $file->getFilename()) === 1) {
                 continue;
             }
 
-            $definition = require_once $file->getPathname();
+            $definition = require $file->getPathname();
             if (!is_array($definition)) {
                 continue;
             }
