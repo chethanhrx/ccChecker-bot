@@ -67,6 +67,12 @@ final class UpdateDispatcher
         ];
 
         $this->fileCommands = $this->discoverFileCommands();
+        $additionalCommands = [];
+        foreach ($this->fileCommands as $name => $definition) {
+            $additionalCommands[$name] = $definition['description'];
+        }
+        $this->commands['/cmd'] = new CmdCommand($additionalCommands);
+        $this->commands['/help'] = $this->commands['/cmd'];
 
         $this->callbacks = [
             'home' => $this->commands['/start'],
@@ -79,6 +85,21 @@ final class UpdateDispatcher
             'auth_demo' => $this->commands['/authdemo'],
             'charge_demo' => $this->commands['/chargedemo'],
         ];
+    }
+
+
+    /** @return list<array{command: string, description: string}> */
+    public function telegramCommands(): array
+    {
+        $commands = [];
+        foreach ($this->fileCommands as $name => $definition) {
+            $commands[] = [
+                'command' => ltrim($name, '/'),
+                'description' => mb_substr($definition['description'] !== '' ? $definition['description'] : 'Run ' . $name, 0, 256),
+            ];
+        }
+
+        return $commands;
     }
 
     /** @param array<string, mixed> $update */
