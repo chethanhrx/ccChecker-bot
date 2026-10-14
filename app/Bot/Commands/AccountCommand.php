@@ -23,6 +23,6 @@ final class AccountCommand implements CommandHandler
         $username = (string) ($user['username'] ?? '');
         $username = $username === '' ? 'Not set' : '@' . $escape($username);
         $name = trim((string) ($user['first_name'] ?? '') . ' ' . (string) ($user['last_name'] ?? ''));
-        $telegram->sendMessage($chatId, "👤 <b>Demo account</b>\n\nName: " . $escape($name) . "\nUsername: " . $username . "\nTelegram ID: <code>" . $escape((string) $user['telegram_id']) . "</code>\nStatus: <b>Registered</b>", Keyboards::dashboard());
+        $credits = max(0, (int) ($user['demo_credits'] ?? 0));\n        $telegram->sendMessage($chatId, "👤 <b>Demo account</b>\\n\\nName: " . $escape($name) . "\\nUsername: " . $username . "\\nTelegram ID: <code>" . $escape((string) ($user['telegram_id'] ?? $id)) . "</code>\\nSandbox credits: <b>" . (string) $credits . "</b>\\nStatus: <b>Registered</b>", Keyboards::dashboard());
     }
 }
