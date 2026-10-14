@@ -18,30 +18,8 @@ final class TelegramApi implements TelegramClientInterface
     /** Publish the bot command menu in Telegram clients. */
     public function setMyCommands(array $additionalCommands = []): void
     {
-        $commands = [
-                ['command' => 'start', 'description' => 'Open the main menu'],
-                ['command' => 'cmd', 'description' => 'List all commands'],
-                ['command' => 'id', 'description' => 'Show your Telegram ID'],
-                ['command' => 'info', 'description' => 'Show bot and sandbox information'],
-                ['command' => 'register', 'description' => 'Create a demo profile'],
-                ['command' => 'account', 'description' => 'View your demo profile'],
-                ['command' => 'buy', 'description' => 'View simulated demo plans'],
-                ['command' => 'balance', 'description' => 'View sandbox credit balance'],
-                ['command' => 'redeem', 'description' => 'Redeem a sandbox demo code'],
-                ['command' => 'chk', 'description' => 'Run a synthetic sandbox scenario'],
-                ['command' => 'bin', 'description' => 'Show BIN lookup availability'],
-                ['command' => 'ping', 'description' => 'Check bot worker response'],
-                ['command' => 'status', 'description' => 'Show worker diagnostics'],
-                ['command' => 'privacy', 'description' => 'Review demo data and privacy notes'],
-                ['command' => 'support', 'description' => 'Show troubleshooting help'],
-                ['command' => 'help', 'description' => 'Show available commands'],
-                ['command' => 'deleteaccount', 'description' => 'Delete your local demo profile'],
-                ['command' => 'tools', 'description' => 'Open demo tools'],
-                ['command' => 'authdemo', 'description' => 'Show a simulated AUTH result'],
-                ['command' => 'chargedemo', 'description' => 'Show a simulated CHARGE result'],
-        ];
-
-        $known = array_column($commands, 'command');
+        $commands = [];
+        $known = [];
         foreach ($additionalCommands as $command) {
             if (!is_array($command) || !isset($command['command'], $command['description'])) {
                 continue;
