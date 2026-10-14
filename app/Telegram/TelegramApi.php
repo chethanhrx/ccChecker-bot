@@ -21,8 +21,17 @@ final class TelegramApi implements TelegramClientInterface
         $this->call('setMyCommands', [
             'commands' => [
                 ['command' => 'start', 'description' => 'Open the main menu'],
-                ['command' => 'help', 'description' => 'Show available commands'],
+                ['command' => 'cmd', 'description' => 'List all commands'],
+                ['command' => 'id', 'description' => 'Show your Telegram ID'],
+                ['command' => 'info', 'description' => 'Show bot and sandbox information'],
+                ['command' => 'register', 'description' => 'Create a demo profile'],
                 ['command' => 'account', 'description' => 'View your demo profile'],
+                ['command' => 'buy', 'description' => 'View simulated demo plans'],
+                ['command' => 'redeem', 'description' => 'Redeem a sandbox demo code'],
+                ['command' => 'chk', 'description' => 'Run a synthetic sandbox scenario'],
+                ['command' => 'bin', 'description' => 'Show BIN lookup availability'],
+                ['command' => 'ping', 'description' => 'Check bot worker response'],
+                ['command' => 'help', 'description' => 'Show available commands'],
                 ['command' => 'deleteaccount', 'description' => 'Delete your local demo profile'],
                 ['command' => 'tools', 'description' => 'Open demo tools'],
                 ['command' => 'authdemo', 'description' => 'Show a simulated AUTH result'],
