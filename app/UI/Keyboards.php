@@ -26,11 +26,14 @@ final class Keyboards
     {
         return ['inline_keyboard' => [
             [
-                ['text' => '🧰 Tools', 'callback_data' => 'tools'],
                 ['text' => '👤 Account', 'callback_data' => 'account'],
+                ['text' => '🪙 Balance', 'callback_data' => 'balance'],
             ],
             [
+                ['text' => '🧰 Tools', 'callback_data' => 'tools'],
                 ['text' => '🏠 Home', 'callback_data' => 'home'],
+            ],
+            [
                 ['text' => '❔ Help', 'callback_data' => 'help'],
             ],
         ]];
@@ -45,7 +48,10 @@ final class Keyboards
                 ['text' => '🧪 CHARGE demo', 'callback_data' => 'charge_demo'],
             ],
             [
+                ['text' => '🪙 Balance', 'callback_data' => 'balance'],
                 ['text' => '👤 Account', 'callback_data' => 'account'],
+            ],
+            [
                 ['text' => '🏠 Home', 'callback_data' => 'home'],
             ],
         ]];
