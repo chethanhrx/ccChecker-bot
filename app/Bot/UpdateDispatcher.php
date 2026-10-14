@@ -49,7 +49,7 @@ final class UpdateDispatcher
             '/redeem' => new RedeemCommand(),
             '/chk' => new ChkCommand(),
             '/bin' => new BinCommand(),
-            '/ping' => new PingCommand(),
+            '/ping' => new PingCommand(),\n            '/status' => new StatusCommand(),\n            '/privacy' => new PrivacyCommand(),\n            '/support' => new SupportCommand(),
             '/tools' => new ToolsCommand(),
             '/authdemo' => new DemoScenarioCommand('auth'),
             '/chargedemo' => new DemoScenarioCommand('charge'),
