@@ -11,7 +11,7 @@ declare(strict_types=1);
 return [
     'command' => 'hello',
     'description' => 'Say hello',
-    'handler' => static function (\\CcCheckerBot\\Bot\\BotContext $bot, array $message): void {
+    'handler' => static function (\CcCheckerBot\\Bot\\BotContext $bot, array $message): void {
         $name = htmlspecialchars(
             (string) ($message['from']['first_name'] ?? 'there'),
             ENT_QUOTES | ENT_SUBSTITUTE,
