@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CcCheckerBot\Tests\Unit;
 
 use CcCheckerBot\Storage\UserStore;
-use PHPUnit\Framework\TestCase;
+use CcCheckerBot\Tests\Support\TestCase;
 
 final class UserStoreTest extends TestCase
 {

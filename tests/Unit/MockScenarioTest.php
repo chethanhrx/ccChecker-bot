@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CcCheckerBot\Tests\Unit;
 
 use CcCheckerBot\Demo\MockScenario;
-use PHPUnit\Framework\TestCase;
+use CcCheckerBot\Tests\Support\TestCase;
 
 final class MockScenarioTest extends TestCase
 {

@@ -7,7 +7,7 @@ namespace CcCheckerBot\Tests\Unit;
 use CcCheckerBot\Bot\UpdateDispatcher;
 use CcCheckerBot\Storage\UserStore;
 use CcCheckerBot\Tests\Support\FakeTelegramClient;
-use PHPUnit\Framework\TestCase;
+use CcCheckerBot\Tests\Support\TestCase;
 
 final class ModularCommandsTest extends TestCase
 {
@@ -59,7 +59,7 @@ final class ModularCommandsTest extends TestCase
         self::assertStringContainsString('Pong', $this->telegram->messages[2]['text']);
 
         $this->send('/info');
-        self::assertStringContainsString('FlintPHP', $this->telegram->messages[3]['text']);
+        self::assertStringContainsString('Architecture: native PHP', $this->telegram->messages[3]['text']);
     }
 
     public function testDemoPurchaseAndRedeemAreClearlySimulated(): void
@@ -135,6 +135,40 @@ final class ModularCommandsTest extends TestCase
         self::assertSame(-100123, $this->telegram->messages[0]['chat_id']);
         self::assertStringContainsString('Group Tester', $this->telegram->messages[0]['text']);
         self::assertStringContainsString('auto-discovered', $this->telegram->messages[0]['text']);
+    }
+
+    public function testNewStandaloneFileIsDiscoveredWithoutDispatcherEdits(): void
+    {
+        $commandsDirectory = sys_get_temp_dir() . '/ccbot-new-command-' . bin2hex(random_bytes(6));
+        mkdir($commandsDirectory, 0775, true);
+        $commandPath = $commandsDirectory . '/freshcommand.php';
+        $commandSource = <<<'PHP'
+<?php
+declare(strict_types=1);
+return [
+    'command' => 'freshcommand',
+    'description' => 'A freshly added command',
+    'handler' => static function (\CcCheckerBot\Bot\BotContext $bot, array $message): void {
+        $bot->sendMsg('Fresh command discovered.');
+    },
+];
+PHP;
+        try {
+            file_put_contents($commandPath, $commandSource);
+            $dispatcher = new UpdateDispatcher($this->telegram, $this->users, $commandsDirectory);
+            self::assertArrayHasKey('/freshcommand', $dispatcher->commandDefinitions());
+            $dispatcher->dispatch(['message' => [
+                'chat' => ['id' => 314],
+                'from' => ['id' => 314, 'first_name' => 'Fresh'],
+                'text' => '/freshcommand',
+            ]]);
+            self::assertSame(314, $this->telegram->messages[0]['chat_id']);
+            self::assertStringContainsString('Fresh command discovered.', $this->telegram->messages[0]['text']);
+            self::assertTrue(in_array('freshcommand', array_column($dispatcher->telegramCommands(), 'command'), true));
+        } finally {
+            if (is_file($commandPath)) unlink($commandPath);
+            if (is_dir($commandsDirectory)) rmdir($commandsDirectory);
+        }
     }
 
     public function testRegisterCommandCreatesProfile(): void

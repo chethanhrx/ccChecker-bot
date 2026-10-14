@@ -1,47 +1,35 @@
 <?php
-
 declare(strict_types=1);
 
 use CcCheckerBot\Bot\UpdateDispatcher;
 use CcCheckerBot\Storage\UserStore;
 use CcCheckerBot\Support\Env;
 use CcCheckerBot\Telegram\TelegramApi;
-use CcCheckerBot\Telegram\TelegramClientInterface;
-use FlintPHP\Framework\Foundation\Application;
 
-require __DIR__ . '/vendor/autoload.php';
-
+require __DIR__ . '/bootstrap.php';
 Env::load(__DIR__ . '/.env');
 
+if (!extension_loaded('curl')) {
+    fwrite(STDERR, "The PHP cURL extension is required. Install/enable ext-curl and retry.\n");
+    exit(1);
+}
 $token = Env::get('TELEGRAM_BOT_TOKEN');
 if ($token === '') {
     fwrite(STDERR, "Missing TELEGRAM_BOT_TOKEN. Copy .env.example to .env and configure it.\n");
     exit(1);
 }
-
 $pollTimeout = max(1, min(50, (int) Env::get('TELEGRAM_POLL_TIMEOUT', '25')));
 $storageDirectory = __DIR__ . '/storage';
 
-if (!is_dir($storageDirectory) && !mkdir($storageDirectory, 0770, true) && !is_dir($storageDirectory)) {
-    fwrite(STDERR, "Cannot create storage directory.\n");
+try {
+    $users = new UserStore($storageDirectory . '/users.json');
+    $api = new TelegramApi($token);
+    $dispatcher = new UpdateDispatcher($api, $users);
+} catch (Throwable $exception) {
+    fwrite(STDERR, 'Bot initialization failed: ' . $exception->getMessage() . "\n");
     exit(1);
 }
-
-/*
- * Use FlintPHP's Application and PSR-11 container for explicit dependency
- * composition. The Telegram worker is CLI long polling, not an HTTP webhook.
- */
-$app = new Application(__DIR__);
-$container = $app->container();
-$container->singleton(TelegramApi::class, static fn () => new TelegramApi($token));
-$container->singleton(TelegramClientInterface::class, static fn () => $container->get(TelegramApi::class));
-$container->singleton(UserStore::class, static fn () => new UserStore($storageDirectory . '/users.json'));
-
-$api = $container->get(TelegramApi::class);
-$dispatcher = $container->get(UpdateDispatcher::class);
-
 try {
-    // Long polling and webhooks cannot be active at the same time.
     $api->deleteWebhook();
     $identity = $api->getMe();
     $api->setMyCommands($dispatcher->telegramCommands());
@@ -49,9 +37,7 @@ try {
     fwrite(STDERR, 'Telegram startup check failed: ' . $exception->getMessage() . "\n");
     exit(1);
 }
-
-$botName = (string) ($identity['username'] ?? 'unknown');
-fwrite(STDOUT, "FlintPHP Telegram bot started as @" . $botName . ". Press Ctrl+C to stop.\n");
+fwrite(STDOUT, "Native PHP Telegram bot started as @" . (string) ($identity['username'] ?? 'unknown') . ". Press Ctrl+C to stop.\n");
 
 $offsetPath = $storageDirectory . '/offset.txt';
 $storedOffset = is_file($offsetPath) ? file_get_contents($offsetPath) : false;
@@ -60,13 +46,9 @@ $backoffSeconds = 1;
 while (true) {
     try {
         $updates = $api->getUpdates($offset, $pollTimeout);
-        if ($updates === []) {
-            $backoffSeconds = 1;
-        }
-
+        if ($updates === []) $backoffSeconds = 1;
         foreach ($updates as $update) {
             $updateId = (int) ($update['update_id'] ?? 0);
-
             try {
                 $dispatcher->dispatch($update);
             } catch (Throwable $exception) {
@@ -75,7 +57,6 @@ while (true) {
                 $backoffSeconds = min(30, $backoffSeconds * 2);
                 break;
             }
-
             $backoffSeconds = 1;
             $offset = max($offset, $updateId + 1);
             if (file_put_contents($offsetPath, (string) $offset, LOCK_EX) === false) {

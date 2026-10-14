@@ -16,6 +16,8 @@ final class UpdateDispatcher
     /** @var array<string, array{description:string, handler:callable}> */
     private array $fileCommands = [];
 
+    private readonly string $commandsDirectory;
+
     /** @var array<string, string> */
     private array $callbacks = [
         'home' => '/start',
@@ -32,7 +34,9 @@ final class UpdateDispatcher
     public function __construct(
         private readonly TelegramClientInterface $telegram,
         private readonly UserStore $users,
+        ?string $commandsDirectory = null,
     ) {
+        $this->commandsDirectory = $commandsDirectory ?? __DIR__ . '/Commands';
         $this->fileCommands = $this->discoverFileCommands();
     }
 
@@ -151,9 +155,12 @@ final class UpdateDispatcher
      */
     private function discoverFileCommands(): array
     {
-        $directory = __DIR__ . '/Commands';
+        if (!is_dir($this->commandsDirectory)) {
+            return [];
+        }
+
         $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS),
+            new RecursiveDirectoryIterator($this->commandsDirectory, \FilesystemIterator::SKIP_DOTS),
         );
         $commands = [];
 

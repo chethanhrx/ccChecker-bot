@@ -2,6 +2,6 @@
 /.env
 /storage/*.json
 /storage/*.lock
-/.phpunit.cache/
-.DS_Store
 /storage/*.txt
+/storage/*.tmp
+.DS_Store

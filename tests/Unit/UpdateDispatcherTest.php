@@ -7,7 +7,7 @@ namespace CcCheckerBot\Tests\Unit;
 use CcCheckerBot\Bot\UpdateDispatcher;
 use CcCheckerBot\Storage\UserStore;
 use CcCheckerBot\Tests\Support\FakeTelegramClient;
-use PHPUnit\Framework\TestCase;
+use CcCheckerBot\Tests\Support\TestCase;
 
 final class UpdateDispatcherTest extends TestCase
 {
