@@ -26,10 +26,14 @@ A modular Telegram bot starter built with **PHP 8.2+**, **FlintPHP**, and Telegr
 | `/account` | View your local demo profile |
 | `/deleteaccount` | Delete your local demo profile |
 | `/buy` | View simulated plans; no checkout |
-| `/redeem DEMO-STARTER` | Redeem 10 sandbox credits once per profile |\n| `/redeem DEMO-LAB` | Redeem 25 sandbox credits once per profile |
+| `/redeem DEMO-STARTER` | Redeem 10 sandbox credits once per profile |
+| `/redeem DEMO-LAB` | Redeem 25 sandbox credits once per profile |
 | `/chk DEMO-1234` | Run a synthetic sandbox scenario |
 | `/bin` | Explain that BIN lookup is disabled |
-| `/ping` | Check that the worker responds |\n| `/status` | Show PHP process and memory diagnostics |\n| `/privacy` | Explain local profile data and privacy boundaries |\n| `/support` | Show troubleshooting guidance |
+| `/ping` | Check that the worker responds |
+| `/status` | Show PHP process and memory diagnostics |
+| `/privacy` | Explain local profile data and privacy boundaries |
+| `/support` | Show troubleshooting guidance |
 | `/tools` | Open the registration-gated demo menu |
 | `/authdemo`, `/chargedemo` | Fixed simulated outcomes |
 
