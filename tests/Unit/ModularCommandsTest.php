@@ -121,6 +121,22 @@ final class ModularCommandsTest extends TestCase
         self::assertStringContainsString('BIN lookup is disabled', $this->telegram->messages[2]['text']);
     }
 
+
+    public function testStandaloneFileCommandIsAutoDiscoveredAndUsesCurrentChat(): void
+    {
+        $this->dispatcher->dispatch([
+            'message' => [
+                'chat' => ['id' => -100123],
+                'from' => ['id' => 42, 'first_name' => 'Group Tester'],
+                'text' => '/hello',
+            ],
+        ]);
+
+        self::assertSame(-100123, $this->telegram->messages[0]['chat_id']);
+        self::assertStringContainsString('Group Tester', $this->telegram->messages[0]['text']);
+        self::assertStringContainsString('auto-discovered', $this->telegram->messages[0]['text']);
+    }
+
     public function testRegisterCommandCreatesProfile(): void
     {
         $this->send('/register');
