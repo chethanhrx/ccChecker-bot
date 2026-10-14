@@ -4,6 +4,17 @@ declare(strict_types=1);
 
 namespace CcCheckerBot\Bot;
 
+use CcCheckerBot\Bot\Commands\BinCommand;
+use CcCheckerBot\Bot\Commands\BuyCommand;
+use CcCheckerBot\Bot\Commands\ChkCommand;
+use CcCheckerBot\Bot\Commands\CmdCommand;
+use CcCheckerBot\Bot\Commands\CommandHandler;
+use CcCheckerBot\Bot\Commands\IdCommand;
+use CcCheckerBot\Bot\Commands\InfoCommand;
+use CcCheckerBot\Bot\Commands\PingCommand;
+use CcCheckerBot\Bot\Commands\RedeemCommand;
+use CcCheckerBot\Bot\Commands\RegisterCommand;
+use CcCheckerBot\Bot\Commands\StartCommand;
 use CcCheckerBot\Demo\MockScenario;
 use CcCheckerBot\Storage\UserStore;
 use CcCheckerBot\Telegram\TelegramClientInterface;
@@ -11,11 +22,27 @@ use CcCheckerBot\UI\Keyboards;
 
 final class UpdateDispatcher
 {
+    /** @var array<string, CommandHandler> */
+    private array $commands;
+
     public function __construct(
         private readonly TelegramClientInterface $telegram,
         private readonly UserStore $users,
         private readonly MockScenario $scenarios = new MockScenario(),
     ) {
+        $this->commands = [
+            '/start' => new StartCommand(),
+            '/cmd' => new CmdCommand(),
+            '/help' => new CmdCommand(),
+            '/id' => new IdCommand(),
+            '/info' => new InfoCommand(),
+            '/register' => new RegisterCommand(),
+            '/buy' => new BuyCommand(),
+            '/redeem' => new RedeemCommand(),
+            '/chk' => new ChkCommand(),
+            '/bin' => new BinCommand(),
+            '/ping' => new PingCommand(),
+        ];
     }
 
     /** @param array<string, mixed> $update */
@@ -41,33 +68,34 @@ final class UpdateDispatcher
             return;
         }
 
-        $command = strtolower((string) strtok($text, " \t\n"));
+        $parts = preg_split('/\s+/', $text, 2) ?: [];
+        $command = strtolower((string) ($parts[0] ?? ''));
         $command = explode('@', $command, 2)[0];
+        $arguments = trim((string) ($parts[1] ?? ''));
+
+        if (isset($this->commands[$command])) {
+            $this->commands[$command]->handle($this->telegram, $this->users, $chatId, $sender, $arguments);
+            return;
+        }
 
         switch ($command) {
-            case '/start':
-                $this->home($chatId, (string) ($sender['first_name'] ?? 'there'));
-                break;
-            case '/help':
-                $this->help($chatId);
-                break;
             case '/account':
                 $this->account($chatId, $sender);
-                break;
+                return;
             case '/deleteaccount':
                 $this->deleteAccount($chatId, $sender);
-                break;
+                return;
             case '/tools':
                 $this->tools($chatId, $sender);
-                break;
+                return;
             case '/authdemo':
                 $this->demo($chatId, 'auth', $sender);
-                break;
+                return;
             case '/chargedemo':
                 $this->demo($chatId, 'charge', $sender);
-                break;
+                return;
             default:
-                $this->telegram->sendMessage($chatId, 'Unknown command. Use /help to see the command list.', Keyboards::home());
+                $this->telegram->sendMessage($chatId, 'Unknown command. Use /cmd to see the command list.', Keyboards::home());
         }
     }
 
@@ -79,7 +107,6 @@ final class UpdateDispatcher
             try {
                 $this->telegram->answerCallback($callbackId);
             } catch (\Throwable $exception) {
-                // A stale callback acknowledgement must not block the action itself.
                 error_log('[telegram-bot] Callback acknowledgement failed: ' . $exception->getMessage());
             }
         }
@@ -93,10 +120,10 @@ final class UpdateDispatcher
 
         switch ((string) ($callback['data'] ?? '')) {
             case 'home':
-                $this->home($chatId, (string) ($sender['first_name'] ?? 'there'));
+                (new StartCommand())->handle($this->telegram, $this->users, $chatId, $sender, '');
                 break;
             case 'register':
-                $this->register($chatId, $sender);
+                (new RegisterCommand())->handle($this->telegram, $this->users, $chatId, $sender, '');
                 break;
             case 'account':
                 $this->account($chatId, $sender);
@@ -105,7 +132,7 @@ final class UpdateDispatcher
                 $this->tools($chatId, $sender);
                 break;
             case 'help':
-                $this->help($chatId);
+                (new CmdCommand())->handle($this->telegram, $this->users, $chatId, $sender, '');
                 break;
             case 'auth_demo':
                 $this->demo($chatId, 'auth', $sender);
@@ -118,36 +145,13 @@ final class UpdateDispatcher
         }
     }
 
-    private function home(int|string $chatId, string $name): void
-    {
-        $this->telegram->sendMessage(
-            $chatId,
-            '👋 <b>Welcome to FlintBot, ' . $this->escape($name) . '!</b>' . "\n\n" .
-            'A modular Telegram bot starter built with PHP and FlintPHP. Register to create your local demo profile.' . "\n\n" .
-            '<i>The AUTH/CHARGE menu items are simulated demonstrations only.</i>',
-            Keyboards::home(),
-        );
-    }
-
-    /** @param array<string, mixed> $sender */
-    private function register(int|string $chatId, array $sender): void
-    {
-        if (!isset($sender['id'])) {
-            $this->telegram->sendMessage($chatId, 'Telegram profile details were unavailable. Please try /start again.');
-            return;
-        }
-
-        $this->users->register($sender);
-        $this->telegram->sendMessage($chatId, '✅ <b>Registration complete.</b> Your local demo profile is ready.', Keyboards::dashboard());
-    }
-
     /** @param array<string, mixed> $sender */
     private function account(int|string $chatId, array $sender): void
     {
         $id = $sender['id'] ?? '';
         $user = $id !== '' ? $this->users->find((string) $id) : null;
         if ($user === null) {
-            $this->telegram->sendMessage($chatId, 'You have not registered yet. Tap Register to create a demo profile.', Keyboards::home());
+            $this->telegram->sendMessage($chatId, 'You have not registered yet. Use /register to create a demo profile.', Keyboards::home());
             return;
         }
 
@@ -156,10 +160,10 @@ final class UpdateDispatcher
         $name = trim((string) ($user['first_name'] ?? '') . ' ' . (string) ($user['last_name'] ?? ''));
         $this->telegram->sendMessage(
             $chatId,
-            '👤 <b>Demo account</b>' . "\n\n" .
+            "👤 <b>Demo account</b>\n\n" .
             'Name: ' . $this->escape($name) . "\n" .
             'Username: ' . $username . "\n" .
-            'Telegram ID: <code>' . $this->escape((string) $user['telegram_id']) . '</code>' . "\n" .
+            'Telegram ID: <code>' . $this->escape((string) $user['telegram_id']) . "</code>\n" .
             'Status: <b>Registered</b>',
             Keyboards::dashboard(),
         );
@@ -182,6 +186,7 @@ final class UpdateDispatcher
         $this->telegram->sendMessage($chatId, 'Your local demo profile has been deleted.', Keyboards::home());
     }
 
+    /** @param array<string, mixed> $sender */
     private function tools(int|string $chatId, array $sender): void
     {
         if (!$this->isRegistered($sender)) {
@@ -191,28 +196,12 @@ final class UpdateDispatcher
 
         $this->telegram->sendMessage(
             $chatId,
-            '🧰 <b>Demo tools</b>' . "\n\n" .
-            'Choose a simulated result below. These buttons do not accept sensitive financial details or contact an external processor.',
+            "🧰 <b>Demo tools</b>\n\nChoose a simulated result below. No sensitive financial details are accepted and no external processor is contacted.",
             Keyboards::tools(),
         );
     }
 
-    private function help(int|string $chatId): void
-    {
-        $this->telegram->sendMessage(
-            $chatId,
-            '<b>Commands</b>' . "\n" .
-            '/start — Welcome menu' . "\n" .
-            '/help — Command guide' . "\n" .
-            '/account — Account information' . "\n" .
-            '/deleteaccount — Delete your local profile' . "\n" .
-            '/tools — Demo tools' . "\n" .
-            '/authdemo — Simulated AUTH result' . "\n" .
-            '/chargedemo — Simulated CHARGE result',
-            Keyboards::dashboard(),
-        );
-    }
-
+    /** @param array<string, mixed> $sender */
     private function demo(int|string $chatId, string $scenario, array $sender): void
     {
         if (!$this->isRegistered($sender)) {
@@ -223,8 +212,8 @@ final class UpdateDispatcher
         $result = $this->scenarios->result($scenario);
         $this->telegram->sendMessage(
             $chatId,
-            '🧪 <b>' . $this->escape($result['title']) . '</b>' . "\n\n" .
-            'Status: <code>' . $this->escape($result['status']) . '</code>' . "\n" .
+            '🧪 <b>' . $this->escape($result['title']) . "</b>\n\n" .
+            'Status: <code>' . $this->escape($result['status']) . "</code>\n" .
             $this->escape($result['message']),
             Keyboards::tools(),
         );
