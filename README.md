@@ -57,6 +57,13 @@ app/
       ChkCommand.php
       BinCommand.php
       PingCommand.php
+      StatusCommand.php
+      PrivacyCommand.php
+      SupportCommand.php
+      AccountCommand.php
+      DeleteAccountCommand.php
+      ToolsCommand.php
+      DemoScenarioCommand.php
   Demo/MockScenario.php
   Storage/UserStore.php
   Support/Env.php
