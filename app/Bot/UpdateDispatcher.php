@@ -95,7 +95,7 @@ final class UpdateDispatcher
         foreach ($this->fileCommands as $name => $definition) {
             $commands[] = [
                 'command' => ltrim($name, '/'),
-                'description' => mb_substr($definition['description'] !== '' ? $definition['description'] : 'Run ' . $name, 0, 256),
+                'description' => substr($definition['description'] !== '' ? $definition['description'] : 'Run ' . $name, 0, 256),
             ];
         }
 
