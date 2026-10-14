@@ -42,30 +42,35 @@ The `/chk` command deliberately rejects pipe-delimited values and long numeric s
 
 ## Project structure
 
+Commands are grouped by responsibility so the dispatcher stays easy to scan:
+
 ```text
 app/
   Bot/
     UpdateDispatcher.php
     Commands/
       CommandHandler.php
-      StartCommand.php
-      CmdCommand.php
-      IdCommand.php
-      InfoCommand.php
-      RegisterCommand.php
-      BuyCommand.php
-      BalanceCommand.php
-      RedeemCommand.php
-      ChkCommand.php
-      BinCommand.php
-      PingCommand.php
-      StatusCommand.php
-      PrivacyCommand.php
-      SupportCommand.php
+      General/
+        StartCommand.php
+      Gates/
+        ChkCommand.php
+      Tools/
+        BinCommand.php
+        IdCommand.php
+        RedeemCommand.php
       AccountCommand.php
+      BalanceCommand.php
+      BuyCommand.php
+      CmdCommand.php
       DeleteAccountCommand.php
-      ToolsCommand.php
       DemoScenarioCommand.php
+      InfoCommand.php
+      PingCommand.php
+      PrivacyCommand.php
+      RegisterCommand.php
+      StatusCommand.php
+      SupportCommand.php
+      ToolsCommand.php
   Demo/MockScenario.php
   Storage/UserStore.php
   Support/Env.php
