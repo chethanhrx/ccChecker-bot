@@ -63,6 +63,34 @@ final class UserStoreTest extends TestCase
         self::assertFalse($store->delete(12345));
     }
 
+    public function testDemoCodeAddsCreditsOnlyOnce(): void
+    {
+        $store = new UserStore($this->path);
+        $store->register(['id' => 12345, 'first_name' => 'Demo']);
+
+        $first = $store->redeemDemoCode(12345, 'DEMO-STARTER');
+        self::assertSame('redeemed', $first['status']);
+        self::assertSame(10, $first['credits']);
+        self::assertSame(10, $first['balance']);
+
+        $again = $store->redeemDemoCode(12345, 'DEMO-STARTER');
+        self::assertSame('already_redeemed', $again['status']);
+        self::assertSame(10, $again['balance']);
+
+        $updated = $store->register(['id' => 12345, 'first_name' => 'Updated']);
+        self::assertSame(10, $updated['demo_credits']);
+        self::assertSame(['DEMO-STARTER'], $updated['redeemed_codes']);
+    }
+
+    public function testRedeemRequiresRegisteredProfile(): void
+    {
+        $store = new UserStore($this->path);
+        self::assertSame(
+            ['status' => 'not_registered', 'credits' => 0],
+            $store->redeemDemoCode(999, 'DEMO-STARTER'),
+        );
+    }
+
     public function testMissingProfileReturnsNull(): void
     {
         self::assertNull((new UserStore($this->path))->find(999));
