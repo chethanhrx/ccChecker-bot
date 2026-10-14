@@ -1,28 +1,74 @@
 # FlintPHP Telegram Bot
 
-A modular, local-first Telegram bot starter using **FlintPHP 1.1+**, PHP 8.2+, and Telegram's Bot API. It uses long polling, so you can run it on your Linux laptop without exposing a public webhook URL.
+A modular Telegram bot starter built with **PHP 8.2+**, **FlintPHP**, and Telegram's Bot API. It runs as a CLI long-polling worker and keeps each primary command in its own class.
 
-> **Demo scope:** The AUTH and CHARGE menu items are fixed mock scenarios for testing bot menus and command routing. They do not provide card-data input or processing, validate payment cards, call payment gateways, authorize payments, or move money. Free-text messages are not stored by this application.
+> **Sandbox boundary:** `/chk` accepts synthetic demo references only. It does not accept or validate payment-card numbers, expiry dates, or CVVs. `/bin` does not perform issuer lookups. Purchase/redeem commands are simulations only; no payment is taken, no paid entitlement is granted, and no payment gateway is contacted.
 
 ## Features
 
 - CLI long polling with persisted update offset and bounded retry backoff
-- FlintPHP `Application` and PSR-11 container for dependency composition
-- `/start`, `/help`, `/account`, `/tools`, `/authdemo`, and `/chargedemo`
-- Inline keyboard navigation and callback-query handling
-- User registration and profile persistence in a local JSON file
-- Telegram command menu configured on startup
-- Environment-based token configuration
-- Unit tests and GitHub Actions CI for PHP 8.2, 8.3, and 8.4
+- FlintPHP application/container for dependency composition
+- Dedicated command handler classes with a shared interface
+- Telegram command menu, inline keyboards, and callback handling
+- Local demo profile registration and deletion
+- Sandbox plans, fixed demo codes, synthetic scenario command, and worker ping
+- PHPUnit tests and GitHub Actions CI for PHP 8.2, 8.3, and 8.4
 
-## Requirements
+## Commands
 
-- PHP 8.2 or newer
-- Composer 2
-- PHP extensions `curl` and `json`
-- A Telegram bot token created with [@BotFather](https://t.me/BotFather)
+| Command | Purpose |
+|---|---|
+| `/start` | Welcome screen and menu |
+| `/cmd` or `/help` | Command guide |
+| `/id` | Show your Telegram user ID |
+| `/info` | Bot runtime and sandbox status |
+| `/register` | Create a local demo profile |
+| `/account` | View your local demo profile |
+| `/deleteaccount` | Delete your local demo profile |
+| `/buy` | View simulated plans; no checkout |
+| `/redeem DEMO-STARTER` | Test a fixed demo code |
+| `/chk DEMO-1234` | Run a synthetic sandbox scenario |
+| `/bin` | Explain that BIN lookup is disabled |
+| `/ping` | Check that the worker responds |
+| `/tools` | Open the registration-gated demo menu |
+| `/authdemo`, `/chargedemo` | Fixed simulated outcomes |
+
+The `/chk` command deliberately rejects pipe-delimited values and long numeric strings to reduce accidental submission of payment-card data. It is not a card checker and does not perform Luhn checks or payment authorization.
+
+## Project structure
+
+```text
+app/
+  Bot/
+    UpdateDispatcher.php
+    Commands/
+      CommandHandler.php
+      StartCommand.php
+      CmdCommand.php
+      IdCommand.php
+      InfoCommand.php
+      RegisterCommand.php
+      BuyCommand.php
+      RedeemCommand.php
+      ChkCommand.php
+      BinCommand.php
+      PingCommand.php
+  Demo/MockScenario.php
+  Storage/UserStore.php
+  Support/Env.php
+  Telegram/TelegramApi.php
+  Telegram/TelegramClientInterface.php
+  UI/Keyboards.php
+tests/
+bot.php
+composer.json
+phpunit.xml
+.env.example
+```
 
 ## Run locally
+
+Requirements: PHP 8.2+, Composer 2, `ext-curl`, `ext-json`, and a Telegram bot token from [@BotFather](https://t.me/BotFather).
 
 ```bash
 git clone https://github.com/chethanhrx/ccChecker-bot.git
@@ -31,79 +77,38 @@ composer install
 cp .env.example .env
 ```
 
-Open `.env` and set your token:
+Set the token in `.env`:
 
 ```dotenv
-TELEGRAM_BOT_TOKEN=put_your_bot_token_here
+TELEGRAM_BOT_TOKEN=your_bot_token_here
 TELEGRAM_POLL_TIMEOUT=25
 ```
 
-Then start the worker:
+Start the worker:
 
 ```bash
 composer start
 ```
 
-Keep that terminal open while using the bot. Press **Ctrl+C** to stop it. The token is secret: do not post it in chat, commit it, or include it in screenshots.
+Keep the terminal open; press Ctrl+C to stop the bot. Never commit or share your bot token.
 
-### Long polling details
-
-On startup, the worker verifies the token, registers the command menu, and removes any existing webhook configuration because Telegram does not allow polling and webhooks to receive updates simultaneously. Existing pending updates are not intentionally discarded. The process persists the update offset across restarts and retries transient polling or dispatch failures with bounded backoff.
-
-## Commands
-
-| Command | Purpose |
-|---|---|
-| `/start` | Open the main menu |
-| `/help` | Show command guide |
-| `/account` | View registration status and profile |
-| `/deleteaccount` | Delete your local demo profile |
-| `/tools` | Open the demo tools menu |
-| `/authdemo` | Return a fixed simulated result |
-| `/chargedemo` | Return a fixed simulated result |
-
-The main menu also provides **Register**, **Account**, **Tools**, and **Help** inline buttons. User records store Telegram ID, username, first name, last name, and registration timestamp in `storage/users.json`. Use `/deleteaccount` to remove your local demo profile.
-
-## Project structure
-
-```text
-app/
-  Bot/UpdateDispatcher.php
-  Demo/MockScenario.php
-  Storage/UserStore.php
-  Support/Env.php
-  Telegram/TelegramApi.php
-  Telegram/TelegramClientInterface.php
-  UI/Keyboards.php
-tests/
-  Unit/MockScenarioTest.php
-  Unit/UpdateDispatcherTest.php
-  Unit/UserStoreTest.php
-  Support/FakeTelegramClient.php
-bot.php
-composer.json
-phpunit.xml
-.env.example
-```
-
-## Tests and quality checks
+## Quality checks
 
 ```bash
+composer validate --no-check-publish --no-check-lock
 composer lint
 composer test
-composer validate --no-check-publish --no-check-lock
 ```
 
-GitHub Actions runs the lint and unit-test commands on PHP 8.2, 8.3, and 8.4. A green workflow is the verification target; do not assume the project is tested until the workflow has actually completed successfully.
-
-## Security and privacy
-
-- Keep `.env` private. Rotate the token immediately if it is exposed.
-- Only Telegram profile fields needed for registration are stored.
-- Do not send card numbers, CVVs, passwords, banking credentials, or other sensitive financial data to this demo. The bot does not need them.
-- AUTH/CHARGE are names for simulated menu examples only. They have no real processor integration.
-- JSON storage is intended for a local starter. Before a public deployment, replace it with a database designed for concurrent access, add retention/deletion controls, access controls, rate limiting, monitoring, and a privacy notice.
+GitHub Actions is configured for PHP 8.2, 8.3, and 8.4. Treat CI as verified only when its latest run is green; this README does not claim that unrun checks passed.
 
 ## How FlintPHP is used
 
-The CLI worker creates a FlintPHP `Application`, registers the Telegram API client and profile store in its container, and resolves the update dispatcher through that container. Telegram transport and update handling remain separate classes so they can be tested and changed independently. This project does not pretend that Telegram's Bot API is an HTTP route in FlintPHP: it is a long-running CLI worker using the framework's dependency-composition facilities.
+The worker boots a FlintPHP `Application` and uses its container to compose the Telegram client, profile store, and dispatcher. Telegram long polling and Bot API transport are kept as separate CLI-oriented components rather than misrepresented as framework HTTP routes.
+
+## Security notes
+
+- Store the Telegram token only in the private `.env` file.
+- The profile JSON file is for local development, not concurrent production use.
+- Do not send real payment data, passwords, or banking credentials to the bot.
+- For a public production bot, add database transactions, rate limiting, structured logging, privacy/retention controls, and deployment monitoring.
