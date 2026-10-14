@@ -79,6 +79,17 @@ final class ModularCommandsTest extends TestCase
         self::assertStringContainsString('Unknown demo code', $this->telegram->messages[4]['text']);
     }
 
+    public function testBalanceCommandShowsPersistentDemoCredits(): void
+    {
+        $this->send('/register');
+        $this->send('/redeem DEMO-STARTER');
+        $this->send('/balance');
+
+        self::assertStringContainsString('Available demo credits', $this->telegram->messages[2]['text']);
+        self::assertStringContainsString('<b>10</b>', $this->telegram->messages[2]['text']);
+        self::assertStringContainsString('DEMO-STARTER', $this->telegram->messages[2]['text']);
+    }
+
     public function testSyntheticCheckWorksButRejectsCardLikeInput(): void
     {
         $this->send('/chk DEMO-1234');
