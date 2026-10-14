@@ -30,7 +30,7 @@ final class TelegramApi implements TelegramClientInterface
                 ['command' => 'redeem', 'description' => 'Redeem a sandbox demo code'],
                 ['command' => 'chk', 'description' => 'Run a synthetic sandbox scenario'],
                 ['command' => 'bin', 'description' => 'Show BIN lookup availability'],
-                ['command' => 'ping', 'description' => 'Check bot worker response'],
+                ['command' => 'ping', 'description' => 'Check bot worker response'],\n                ['command' => 'status', 'description' => 'Show worker diagnostics'],\n                ['command' => 'privacy', 'description' => 'Review demo data and privacy notes'],\n                ['command' => 'support', 'description' => 'Show troubleshooting help'],
                 ['command' => 'help', 'description' => 'Show available commands'],
                 ['command' => 'deleteaccount', 'description' => 'Delete your local demo profile'],
                 ['command' => 'tools', 'description' => 'Open demo tools'],
