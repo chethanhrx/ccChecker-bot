@@ -11,7 +11,7 @@ A modular Telegram bot starter built with **PHP 8.2+**, **FlintPHP**, and Telegr
 - Dedicated command handler classes with a shared interface
 - Telegram command menu, inline keyboards, and callback handling
 - Local demo profile registration and deletion
-- Sandbox plans, fixed demo codes, synthetic scenario command, and worker ping
+- Sandbox plans, one-time demo-code redemption with persistent demo-credit balances, synthetic scenario command, worker diagnostics, privacy notes, and support command
 - PHPUnit tests and GitHub Actions CI for PHP 8.2, 8.3, and 8.4
 
 ## Commands
@@ -26,14 +26,14 @@ A modular Telegram bot starter built with **PHP 8.2+**, **FlintPHP**, and Telegr
 | `/account` | View your local demo profile |
 | `/deleteaccount` | Delete your local demo profile |
 | `/buy` | View simulated plans; no checkout |
-| `/redeem DEMO-STARTER` | Test a fixed demo code |
+| `/redeem DEMO-STARTER` | Redeem 10 sandbox credits once per profile |\n| `/redeem DEMO-LAB` | Redeem 25 sandbox credits once per profile |
 | `/chk DEMO-1234` | Run a synthetic sandbox scenario |
 | `/bin` | Explain that BIN lookup is disabled |
-| `/ping` | Check that the worker responds |
+| `/ping` | Check that the worker responds |\n| `/status` | Show PHP process and memory diagnostics |\n| `/privacy` | Explain local profile data and privacy boundaries |\n| `/support` | Show troubleshooting guidance |
 | `/tools` | Open the registration-gated demo menu |
 | `/authdemo`, `/chargedemo` | Fixed simulated outcomes |
 
-The `/chk` command deliberately rejects pipe-delimited values and long numeric strings to reduce accidental submission of payment-card data. It is not a card checker and does not perform Luhn checks or payment authorization.
+The `/chk` command deliberately rejects pipe-delimited values and long numeric strings to reduce accidental submission of payment-card data. It is not a card checker and does not perform Luhn checks or payment authorization. Demo credits are local counters only and have no monetary value. Redeem codes are fixed, one-time-per-profile sandbox examples.
 
 ## Project structure
 
@@ -100,7 +100,7 @@ composer lint
 composer test
 ```
 
-GitHub Actions is configured for PHP 8.2, 8.3, and 8.4. Treat CI as verified only when its latest run is green; this README does not claim that unrun checks passed.
+The repository includes a PHPUnit suite and a PHP-version matrix for later verification. During this development pass, the focus is implementation and code review; run the checks locally before deploying.
 
 ## How FlintPHP is used
 
