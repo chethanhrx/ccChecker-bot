@@ -18,7 +18,7 @@ final class CmdCommand implements CommandHandler
     {
         $extra = '';
         foreach ($this->additionalCommands as $command => $description) {
-            $extra .= "\\n" . htmlspecialchars($command, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
+            $extra .= "\n" . htmlspecialchars($command, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
                 . ' — ' . htmlspecialchars($description, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         }
 
