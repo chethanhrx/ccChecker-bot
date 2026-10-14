@@ -8,7 +8,7 @@ A modular Telegram bot starter built with **PHP 8.2+**, **FlintPHP**, and Telegr
 
 - CLI long polling with persisted update offset and bounded retry backoff
 - FlintPHP application/container for dependency composition
-- Auto-discovered standalone PHP command files (plus legacy handlers during migration)
+- Every command is a standalone PHP file discovered automatically at startup
 - New file commands automatically appear in the dispatcher, `/cmd` help, and Telegram command menu
 - Telegram command menu, inline keyboards, and callback handling
 - Local demo profile registration and deletion
@@ -50,28 +50,30 @@ app/
   Bot/
     UpdateDispatcher.php
     Commands/
-      CommandHandler.php
       General/
-        StartCommand.php
+        start.php
+        cmd.php
+        help.php
+        hello.php
+        info.php
+        ping.php
+        privacy.php
+        status.php
+        support.php
       Gates/
-        ChkCommand.php
+        chk.php
+        authdemo.php
+        chargedemo.php
       Tools/
-        BinCommand.php
-        IdCommand.php
-        RedeemCommand.php
-      AccountCommand.php
-      BalanceCommand.php
-      BuyCommand.php
-      CmdCommand.php
-      DeleteAccountCommand.php
-      DemoScenarioCommand.php
-      InfoCommand.php
-      PingCommand.php
-      PrivacyCommand.php
-      RegisterCommand.php
-      StatusCommand.php
-      SupportCommand.php
-      ToolsCommand.php
+        id.php
+        register.php
+        account.php
+        deleteaccount.php
+        buy.php
+        balance.php
+        redeem.php
+        bin.php
+        tools.php
   Demo/MockScenario.php
   Storage/UserStore.php
   Support/Env.php
@@ -115,9 +117,7 @@ current update's chat ID, so replies go to the correct private chat or group.
 The context also provides `$bot->arguments()`, `$bot->sender()`,
 `$bot->users()`, `$bot->telegram()`, and `$bot->chatId()`.
 
-Standalone files are loaded from `General/`, `Tools/`, `Gates/`, and nested
-folders. Existing class-based commands remain compatible while they are migrated;
-new commands should use this file-based format.
+All active commands are standalone files loaded from `General/`, `Tools/`, `Gates/`, and nested folders. There is no command-class map to update. Each file owns its command name, help description, and handler.
 
 ## Run locally
 
