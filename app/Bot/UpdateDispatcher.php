@@ -154,7 +154,7 @@ final class UpdateDispatcher
                 continue;
             }
 
-            $definition = require $file->getPathname();
+            $definition = require_once $file->getPathname();
             if (!is_array($definition)) {
                 continue;
             }
