@@ -6,6 +6,7 @@ namespace CcCheckerBot\Bot\Commands;
 
 use CcCheckerBot\Storage\UserStore;
 use CcCheckerBot\Telegram\TelegramClientInterface;
+use CcCheckerBot\UI\Keyboards;
 
 final class BuyCommand implements CommandHandler
 {
@@ -13,10 +14,13 @@ final class BuyCommand implements CommandHandler
     {
         $telegram->sendMessage(
             $chatId,
-            "<b>🛍️ Demo plans</b>\n\n" .
-            "🟢 Starter — 10 sandbox runs\n🔵 Developer — 50 sandbox runs\n🟣 Lab — 100 sandbox runs\n\n" .
-            "These are display-only plans: no payment is taken and no subscription is created.\n" .
-            "Try /redeem DEMO-STARTER to test the demo-code flow.",
+            "<b>🛍️ Sandbox plans</b>\n\n" .
+            "🟢 <b>Starter</b> — 10 demo credits\n" .
+            "🔵 <b>Developer</b> — 50 demo credits\n" .
+            "🟣 <b>Lab</b> — 100 demo credits\n\n" .
+            "This is a preview of the future plan catalogue. Checkout is not connected, no payment is collected, and these plans do not grant entitlements.\n\n" .
+            "For a working sandbox flow, register with /register and redeem /redeem DEMO-STARTER or /redeem DEMO-LAB.",
+            Keyboards::dashboard(),
         );
     }
 }
