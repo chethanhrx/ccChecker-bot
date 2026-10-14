@@ -8,7 +8,8 @@ A modular Telegram bot starter built with **PHP 8.2+**, **FlintPHP**, and Telegr
 
 - CLI long polling with persisted update offset and bounded retry backoff
 - FlintPHP application/container for dependency composition
-- Dedicated command handler classes with a shared interface
+- Auto-discovered standalone PHP command files (plus legacy handlers during migration)
+- New file commands automatically appear in the dispatcher, `/cmd` help, and Telegram command menu
 - Telegram command menu, inline keyboards, and callback handling
 - Local demo profile registration and deletion
 - Sandbox plans, one-time demo-code redemption with persistent demo-credit balances, synthetic scenario command, worker diagnostics, privacy notes, and support command
@@ -83,6 +84,40 @@ composer.json
 phpunit.xml
 .env.example
 ```
+
+## Add a command (no dispatcher edits)
+
+Create a normal PHP file anywhere under `app/Bot/Commands/`, for example
+`app/Bot/Commands/General/hello.php`. The file returns its own command name,
+description, and handler. The dispatcher discovers it automatically at startup.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+return [
+    'command' => 'hello',
+    'description' => 'Say hello',
+    'handler' => static function (
+        \\CcCheckerBot\\Bot\\BotContext $bot,
+        array $message,
+    ): void {
+        $bot->sendMsg('Hello from my new command!');
+    },
+];
+```
+
+That's all: no class, no command-map edit, no separate handler registration, and
+no edits to the Telegram command menu. The command name and menu description
+live in the same file. The `$bot->sendMsg(...)` helper automatically uses the
+current update's chat ID, so replies go to the correct private chat or group.
+The context also provides `$bot->arguments()`, `$bot->sender()`,
+`$bot->users()`, `$bot->telegram()`, and `$bot->chatId()`.
+
+Standalone files are loaded from `General/`, `Tools/`, `Gates/`, and nested
+folders. Existing class-based commands remain compatible while they are migrated;
+new commands should use this file-based format.
 
 ## Run locally
 
