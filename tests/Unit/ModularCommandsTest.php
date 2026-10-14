@@ -64,15 +64,19 @@ final class ModularCommandsTest extends TestCase
 
     public function testDemoPurchaseAndRedeemAreClearlySimulated(): void
     {
+        $this->send('/register');
         $this->send('/buy');
-        self::assertStringContainsString('no payment is taken', strtolower($this->telegram->messages[0]['text']));
+        self::assertStringContainsString('no payment is taken', strtolower($this->telegram->messages[1]['text']));
 
         $this->send('/redeem DEMO-STARTER');
-        self::assertStringContainsString('Demo code accepted', $this->telegram->messages[1]['text']);
-        self::assertStringContainsString('non-persistent simulation', $this->telegram->messages[1]['text']);
+        self::assertStringContainsString('Demo code redeemed', $this->telegram->messages[2]['text']);
+        self::assertStringContainsString('10', $this->telegram->messages[2]['text']);
+
+        $this->send('/redeem DEMO-STARTER');
+        self::assertStringContainsString('already been redeemed', $this->telegram->messages[3]['text']);
 
         $this->send('/redeem NOT-A-CODE');
-        self::assertStringContainsString('Unknown demo code', $this->telegram->messages[2]['text']);
+        self::assertStringContainsString('Unknown demo code', $this->telegram->messages[4]['text']);
     }
 
     public function testSyntheticCheckWorksButRejectsCardLikeInput(): void
