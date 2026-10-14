@@ -1,0 +1,3 @@
+<?php
+declare(strict_types=1);
+return ['command'=>'tools','description'=>'Open sandbox tools','handler'=>static function(array $c):void{$id=$c['sender']['id']??null;if($id===null||bot_user_find($id)===null){bot_send($c['chat_id'],'Please register first to unlock the demo tools.',bot_keyboard_home());return;}bot_send($c['chat_id'],"🧰 <b>Sandbox tools</b>\n\nChoose a synthetic scenario. Buttons return fixed demo outcomes only.",bot_keyboard_tools());}];

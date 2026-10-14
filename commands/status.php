@@ -1,0 +1,3 @@
+<?php
+declare(strict_types=1);
+return ['command'=>'status','description'=>'Show worker diagnostics','handler'=>static function(array $c):void{$m=memory_get_usage(true);$s=$m>=1048576?number_format($m/1048576,1).' MiB':number_format($m/1024,1).' KiB';bot_send($c['chat_id'],"<b>📊 Worker status</b>\n\nPHP: <code>".PHP_VERSION."</code>\nMemory: <code>{$s}</code>\nMode: <code>long-polling</code>\nSandbox: <code>enabled</code>");}];

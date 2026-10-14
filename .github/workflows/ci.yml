@@ -19,6 +19,6 @@ jobs:
           extensions: curl
           coverage: none
       - name: Lint PHP
-        run: find app tests -name '*.php' -print0 | xargs -0 -n1 php -l && php -l bot.php && php -l bootstrap.php
+        run: find . -path './.git' -prune -o -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: Run native tests
         run: php tests/run.php

@@ -1,0 +1,3 @@
+<?php
+declare(strict_types=1);
+return ['command'=>'account','description'=>'View your demo profile','handler'=>static function(array $c):void{$id=$c['sender']['id']??null;$p=$id!==null?bot_user_find($id):null;if(!$p){bot_send($c['chat_id'],'You have not registered yet. Use /register.',bot_keyboard_home());return;}$e=static fn($v)=>htmlspecialchars((string)$v,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8');$n=trim(($p['first_name']??'').' '.($p['last_name']??''));$u=($p['username']??'')!==''?'@'.$e($p['username']):'Not set';bot_send($c['chat_id'],"👤 <b>Demo account</b>\n\nName: ".$e($n)."\nUsername: {$u}\nTelegram ID: <code>".$e($p['telegram_id']??$id)."</code>\nSandbox credits: <b>".max(0,(int)($p['demo_credits']??0))."</b>\nStatus: <b>Registered</b>",bot_keyboard_dashboard());}];

@@ -1,0 +1,3 @@
+<?php
+declare(strict_types=1);
+return ['command'=>'deleteaccount','description'=>'Delete your local profile','handler'=>static function(array $c):void{$id=$c['sender']['id']??null;if($id===null){bot_send($c['chat_id'],'I could not identify your Telegram profile.');return;}bot_send($c['chat_id'],bot_user_delete($id)?'Your local demo profile has been deleted.':'No registered demo profile was found.',bot_keyboard_home());}];

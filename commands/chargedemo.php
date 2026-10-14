@@ -1,0 +1,3 @@
+<?php
+declare(strict_types=1);
+return ['command'=>'chargedemo','description'=>'Run fixed charge mock','handler'=>static function(array $c):void{$id=$c['sender']['id']??null;if($id===null||bot_user_find($id)===null){bot_send($c['chat_id'],'Please register first to unlock the demo tools.',bot_keyboard_home());return;}$r=bot_demo_result('charge');$e=fn($s)=>htmlspecialchars($s,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8');bot_send($c['chat_id'],'🧪 <b>'.$e($r['title'])."</b>\n\nStatus: <code>".$e($r['status'])."</code>\n".$e($r['message']),bot_keyboard_tools());}];

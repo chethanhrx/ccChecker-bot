@@ -1,0 +1,3 @@
+<?php
+declare(strict_types=1);
+return ['command'=>'info','description'=>'About this demo bot','handler'=>static function(array $c):void{$id=$c['sender']['id']??'';$registered=$id!==''&&bot_user_find($id)!==null;bot_send($c['chat_id'],"<b>ℹ️ ccChecker sandbox</b>\n\nRuntime: PHP ".PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION."\nArchitecture: plain PHP functions\nMode: simulated demo\nProfile: ".($registered?'registered':'guest')."\n\n<i>No real payment authorization or financial-data storage is performed.</i>");}];

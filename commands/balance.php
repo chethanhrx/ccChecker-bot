@@ -1,0 +1,3 @@
+<?php
+declare(strict_types=1);
+return ['command'=>'balance','description'=>'View sandbox balance','handler'=>static function(array $c):void{$id=$c['sender']['id']??null;$p=$id!==null?bot_user_find($id):null;if(!$p){bot_send($c['chat_id'],'Register with /register before checking your sandbox balance.',bot_keyboard_home());return;}$codes=$p['redeemed_codes']??[];$codes=$codes?implode(', ',array_map(fn($v)=>htmlspecialchars((string)$v,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8'),$codes)):'None yet';bot_send($c['chat_id'],"<b>🪙 Sandbox balance</b>\n\nAvailable demo credits: <b>".max(0,(int)($p['demo_credits']??0))."</b>\nRedeemed codes: {$codes}\n\nCredits have no monetary value.",bot_keyboard_dashboard());}];

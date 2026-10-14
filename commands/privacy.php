@@ -1,0 +1,3 @@
+<?php
+declare(strict_types=1);
+return ['command'=>'privacy','description'=>'Review demo privacy','handler'=>static function(array $c):void{bot_send($c['chat_id'],"<b>🔐 Demo privacy</b>\n\n• The local store keeps Telegram ID, display name, username, and registration time.\n• Never send card numbers, expiry dates, CVVs, passwords, or banking details.\n• /deleteaccount removes your local profile.\n• /info explains the sandbox scope.");}];
