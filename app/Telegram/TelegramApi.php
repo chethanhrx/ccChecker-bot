@@ -16,10 +16,9 @@ final class TelegramApi implements TelegramClientInterface
     }
 
     /** Publish the bot command menu in Telegram clients. */
-    public function setMyCommands(): void
+    public function setMyCommands(array $additionalCommands = []): void
     {
-        $this->call('setMyCommands', [
-            'commands' => [
+        $commands = [
                 ['command' => 'start', 'description' => 'Open the main menu'],
                 ['command' => 'cmd', 'description' => 'List all commands'],
                 ['command' => 'id', 'description' => 'Show your Telegram ID'],
@@ -40,8 +39,21 @@ final class TelegramApi implements TelegramClientInterface
                 ['command' => 'tools', 'description' => 'Open demo tools'],
                 ['command' => 'authdemo', 'description' => 'Show a simulated AUTH result'],
                 ['command' => 'chargedemo', 'description' => 'Show a simulated CHARGE result'],
-            ],
-        ]);
+        ];
+
+        $known = array_column($commands, 'command');
+        foreach ($additionalCommands as $command) {
+            if (!is_array($command) || !isset($command['command'], $command['description'])) {
+                continue;
+            }
+            if (in_array($command['command'], $known, true)) {
+                continue;
+            }
+            $commands[] = $command;
+            $known[] = $command['command'];
+        }
+
+        $this->call('setMyCommands', ['commands' => $commands]);
     }
 
     /** Remove any existing webhook so long polling can be used. */
