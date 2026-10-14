@@ -102,7 +102,7 @@ return [
     'command' => 'hello',
     'description' => 'Say hello',
     'handler' => static function (
-        \\CcCheckerBot\\Bot\\BotContext $bot,
+        \CcCheckerBot\Bot\BotContext $bot,
         array $message,
     ): void {
         $bot->sendMsg('Hello from my new command!');
