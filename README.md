@@ -1,6 +1,6 @@
 # FlintPHP Telegram Bot
 
-A modular Telegram bot starter built with **PHP 8.2+**, **FlintPHP**, and Telegram's Bot API. It runs as a CLI long-polling worker and keeps each primary command in its own class.
+A modular Telegram bot starter built with **PHP 8.2+**, **FlintPHP**, and Telegram's Bot API. It runs as a CLI long-polling worker with automatically discovered file-based commands.
 
 > **Sandbox boundary:** `/chk` accepts synthetic demo references only. It does not accept or validate payment-card numbers, expiry dates, or CVVs. `/bin` does not perform issuer lookups. Purchase/redeem commands are simulations only; no payment is taken, no paid entitlement is granted, and no payment gateway is contacted.
 
