@@ -67,7 +67,7 @@ declare(strict_types=1);
 return [
     'command' => 'helloagain',
     'description' => 'Say hello again',
-    'handler' => static function (\CcCheckerBot\\Bot\\BotContext $bot, array $message): void {
+    'handler' => static function (\CcCheckerBot\Bot\BotContext $bot, array $message): void {
         $bot->sendMsg('Hello from my new command!');
     },
 ];
