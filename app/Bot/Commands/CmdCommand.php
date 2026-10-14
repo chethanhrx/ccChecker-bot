@@ -10,8 +10,18 @@ use CcCheckerBot\UI\Keyboards;
 
 final class CmdCommand implements CommandHandler
 {
+    /** @param array<string, string> $additionalCommands */
+    public function __construct(private readonly array $additionalCommands = [])
+    {
+    }
     public function handle(TelegramClientInterface $telegram, UserStore $users, int|string $chatId, array $sender, string $arguments): void
     {
+        $extra = '';
+        foreach ($this->additionalCommands as $command => $description) {
+            $extra .= "\\n" . htmlspecialchars($command, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
+                . ' — ' . htmlspecialchars($description, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        }
+
         $telegram->sendMessage(
             $chatId,
             "<b>🧭 Command centre</b>\n\n" .
@@ -20,7 +30,7 @@ final class CmdCommand implements CommandHandler
             "/buy — View sandbox plans\n/balance — View demo credit balance\n/redeem DEMO-STARTER — Redeem a demo code\n" .
             "/chk DEMO-1234 — Run a synthetic sandbox scenario\n/bin — BIN lookup status\n/ping — Worker response check\n" .
             "/status — Worker diagnostics\n/privacy — Privacy and stored-data notes\n/support — Troubleshooting help\n" .
-            "/tools — Demo menu\n/authdemo and /chargedemo — Fixed mock scenarios",
+            "/tools — Demo menu\n/authdemo and /chargedemo — Fixed mock scenarios" . $extra,
             Keyboards::dashboard(),
         );
     }
