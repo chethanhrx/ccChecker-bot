@@ -67,6 +67,7 @@ final class UpdateDispatcher
             'home' => $this->commands['/start'],
             'register' => $this->commands['/register'],
             'account' => $this->commands['/account'],
+            'balance' => $this->commands['/balance'],
             'delete_account' => $this->commands['/deleteaccount'],
             'tools' => $this->commands['/tools'],
             'help' => $this->commands['/cmd'],
